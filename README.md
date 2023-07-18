@@ -151,6 +151,7 @@ Example command:
 ## 🔭 Schema Diagram <a name="Schema Diagram"></a>
 
 ![Schema diagram](<schema diagram.png>)
+![RESULT](result.png)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
