@@ -4,25 +4,25 @@ CREATE TABLE patients (
     date_of_birth DATE NOT NULL
 );
 
-CREATE TABLE medical_histories (
-    id BIGINT NOT NULL PRIMARY KEY,
-    admitted_at TIMESTAMP,
-    patients_id INTEGER REFERENCES patients(id),
-    status VARCHAR(100)
-);
-
-CREATE TABLE treatmens (
+CREATE TABLE treatments (
     id BIGINT NOT NULL PRIMARY KEY,
     type VARCHAR(100),
     name VARCHAR(100)
 );
 
+CREATE TABLE medical_histories (
+    id BIGINT NOT NULL PRIMARY KEY,
+    admitted_at TIMESTAMP,
+    patients_id INTEGER REFERENCES patients(id),
+    treatment_id INTEGER REFERENCES treatments(id) -- Add the foreign key referencing treatments table
+);
+
 CREATE TABLE invoices (
-id BIGINT NOT NULL PRIMARY KEY,
-total_amount DECIMAL,
-generated_at TIMESTAMP,
-payed_at TIMESTAMP,
-medical_history_id INTEGER REFERENCES medical_histories(id)
+    id BIGINT NOT NULL PRIMARY KEY,
+    total_amount DECIMAL,
+    generated_at TIMESTAMP,
+    payed_at TIMESTAMP,
+    medical_history_id INTEGER REFERENCES medical_histories(id)
 );
 
 CREATE TABLE invoice_items (
@@ -31,11 +31,22 @@ CREATE TABLE invoice_items (
     quantity INTEGER,
     total_price DECIMAL,
     invoice_id INTEGER REFERENCES invoices(id),
-    treatment_id INTEGER REFERENCES treatmens(id)
+    treatment_id INTEGER REFERENCES treatments(id)
 );
 
--- Index
-CREATE INDEX id_invoice_items_treatment_id ON invoice_items (treatment_id);
+CREATE TABLE medical_history_treatments (
+    id SERIAL PRIMARY KEY,
+    medical_history_id INT NOT NULL,
+    treatment_id INT NOT NULL,
+    FOREIGN KEY (medical_history_id) REFERENCES medical_histories (id),
+    FOREIGN KEY (treatment_id) REFERENCES treatments (id)
+);
+
+-- Indexes
+CREATE INDEX id_invoice_items_treatments_id ON invoice_items (treatment_id);
 CREATE INDEX id_invoice_items_invoice_id ON invoice_items (invoice_id);
 CREATE INDEX id_invoices_medical_history_id ON invoices (medical_history_id);
 CREATE INDEX id_medical_histories_patients_id ON medical_histories (patients_id);
+CREATE INDEX id_medical_histories_treatments_id ON medical_histories (treatment_id);
+CREATE INDEX ON medical_history_treatments (medical_history_id);
+CREATE INDEX ON medical_history_treatments (treatment_id);
